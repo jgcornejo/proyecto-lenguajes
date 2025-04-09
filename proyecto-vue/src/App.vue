@@ -29,6 +29,14 @@ export default{
     this.numeroCategorias = this.getCategories();
     this.totalProductos = this.getTotalProducts();
     this.getProducts();
+
+    this.intervalId = setInterval(() => {
+      this.getProducts();
+    }, 5000); // Actualiza cada 5 segundos
+
+  },
+  beforeDestroy() {
+    clearInterval(this.intervalId);
   },
   methods: {
     getCategories() {
