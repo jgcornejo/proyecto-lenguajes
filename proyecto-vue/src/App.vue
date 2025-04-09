@@ -9,6 +9,9 @@ export default{
   data() {
     return {
       dialog: false,
+      showDetails: false,
+      selectedProduct: null,
+      showEdit: false,
       search: '',
       numeroCategorias: 0,
       totalProductos: 0,
@@ -28,15 +31,16 @@ export default{
   mounted() {
     this.numeroCategorias = this.getCategories();
     this.totalProductos = this.getTotalProducts();
-    this.getProducts();
-
-    this.intervalId = setInterval(() => {
-      this.getProducts();
-    }, 5000); // Actualiza cada 5 segundos
-
+    this.getProducts()
   },
-  beforeDestroy() {
-    clearInterval(this.intervalId);
+  watch: {
+    search(newValue) {
+      if (newValue === '' || newValue > 0) {
+        this.getProducts()
+      } else {
+        this.loading = true
+      }
+    }
   },
   methods: {
     getCategories() {
@@ -46,6 +50,10 @@ export default{
     getTotalProducts() {
       // Aqui va la logica para obtener el total de productos
       return 100;
+    },
+    selectProduct(item) {
+      this.selectedProduct = item
+      this.showDetails = true
     },
     clearForm() {
       this.productImage = '';
@@ -113,6 +121,26 @@ export default{
       } catch (e) {
         console.error("Error al obtener los productos: ", e);
       }
+    },
+    async filterProducts() {
+      try {
+        const q = query(collection(db, "products"), where("productName", "==", this.search))
+        const querySnapshot = await getDocs(q)
+        this.items = [];
+        querySnapshot.forEach((doc) => {
+          this.items.push({ 
+            Products: doc.data().productName,
+            Buying_Price: "$ " + doc.data().productBuyingPrice,
+            Quantity: doc.data().productQuantity + " Packets",
+            Threshold_Value: doc.data().productThresholdValue + " Packets",
+            Expiration_Date: doc.data().productExpiryDate,
+            Avalability: doc.data().productQuantity > doc.data().productThresholdValue ? "In - Stock" : "Out of stock",
+          })
+        })
+        
+      } catch (e) {
+        console.error("Error al filtrar los productos: ", e);
+      }
     }
     
   }
@@ -129,7 +157,7 @@ export default{
               <h1>KANBAN</h1>
             </div>
           </v-list-item>
-          <v-list-item link id="comienzoLista">
+          <v-list-item link id="comienzoLista" @click="showDetails = false">
             <v-icon style="margin-right: 10px;">mdi-home</v-icon>
             <a href="">Dashboard</a>
           </v-list-item>
@@ -196,7 +224,7 @@ export default{
             </v-card>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="!showDetails">
           <v-col>
             <v-card id="tarjeta2">
               <h3 style="margin-bottom: 10px;">Overall Inventory</h3>
@@ -253,7 +281,7 @@ export default{
             </v-card>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="!showDetails">
           <v-col>
             <v-card id="tarjeta3">
               <v-row>
@@ -276,10 +304,50 @@ export default{
                   </div>
                 </v-col>
               </v-row>
-              <v-row>
+              <v-row v-if="!showDetails">
                 <v-col>
                   <div id="tarjeta3Tabla">
-                    <v-data-table :items="items" dense :items-per-page="4"></v-data-table>
+                    <v-data-table :items="items" 
+                      dense :items-per-page="4" 
+                      :search="search"
+                    >
+                      <template v-slot:item="{ item }">
+                        <tr @click="selectProduct(item)">
+                          <td>{{ item.Products }}</td>
+                          <td>{{ item.Buying_Price }}</td>
+                          <td>{{ item.Quantity }}</td>
+                          <td>{{ item.Threshold_Value }}</td>
+                          <td>{{ item.Expiration_Date }}</td>
+                          <td>{{ item.Avalability }}</td>
+                        </tr>
+                      </template>
+                    </v-data-table>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-col>
+        </v-row>
+
+        
+        <!-- TARJETA DE DETALLES -->
+
+        <v-row v-if="showDetails">
+          <v-col>
+            <v-card id="tarjeta4">
+              <v-row>
+                <v-col>
+                  <div id="tarjeta4Botones">
+                    <h3>{{ selectedProduct.Products }}</h3>
+                    <v-btn @click="showEdit = true"
+                      style="margin-right: 20px;"
+                      prepend-icon="mdi-pencil"
+                    >
+                      Edit
+                    </v-btn>
+                    <v-btn>
+                      Download
+                    </v-btn>
                   </div>
                 </v-col>
               </v-row>
@@ -401,8 +469,7 @@ export default{
             </v-card>
           </v-dialog>
           </div>
-        </template>
-        
+        </template>       
 
       </v-main>
     </v-app>
@@ -491,6 +558,20 @@ export default{
 
 #tarjeta3Botones h3 {
   width: 70%;
+}
+
+#tarjeta4 {
+  margin: 0px 20px 0px 20px;
+  padding: 20px;
+}
+
+#tarjeta4Botones {
+  display: flex;
+  align-items: center;
+}
+
+#tarjeta4Botones h3 {
+  width: 80%;
 }
 
 .campos {
