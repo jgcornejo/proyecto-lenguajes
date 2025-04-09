@@ -1,24 +1,34 @@
 <script>
+import { db } from '../firebase.js';
+import {collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where} from 'firebase/firestore';
+
 export default{
   name: 'App',
+  components: {
+  },
   data() {
     return {
+      dialog: false,
       search: '',
       numeroCategorias: 0,
       totalProductos: 0,
+      productImage: '',
+      productName: '',
+      productId: '',
+      productCategory: '',
+      productBuyingPrice: '',
+      productQuantity: '',
+      productUnit: '',
+      productExpiryDate: '',
+      productThresholdValue: '',
       items: [
-        { products: '', buyingPrice: '', Quantity: '', thresholdValue: '', expirityDate: '', Availability: ''},
-        { products: '1', buyingPrice: '', Quantity: '', thresholdValue: '', expirityDate: '', Availability: ''},
-        { products: '2', buyingPrice: '', Quantity: '', thresholdValue: '', expirityDate: '', Availability: ''},
-        { products: '3', buyingPrice: '', Quantity: '', thresholdValue: '', expirityDate: '', Availability: ''},
-        { products: '4', buyingPrice: '', Quantity: '', thresholdValue: '', expirityDate: '', Availability: ''},
-        { products: '5', buyingPrice: '', Quantity: '', thresholdValue: '', expirityDate: '', Availability: ''},
       ]
     }
   },
   mounted() {
     this.numeroCategorias = this.getCategories();
     this.totalProductos = this.getTotalProducts();
+    this.getProducts();
   },
   methods: {
     getCategories() {
@@ -28,7 +38,75 @@ export default{
     getTotalProducts() {
       // Aqui va la logica para obtener el total de productos
       return 100;
+    },
+    clearForm() {
+      this.productImage = '';
+      this.productName = '';
+      this.productId = '';
+      this.productCategory = '';
+      this.productBuyingPrice = '';
+      this.productQuantity = '';
+      this.productUnit = '';
+      this.productExpiryDate = '';
+      this.productThresholdValue = '';
+    },
+    async submitForm() {
+      try {
+
+        // Validar que todos los campos estén llenos
+        if (!this.productImage || !this.productName || !this.productId || !this.productCategory || !this.productBuyingPrice || !this.productQuantity || !this.productUnit || !this.productExpiryDate || !this.productThresholdValue) {
+          alert("Por favor, completa todos los campos.");
+          return;
+        }
+
+        // Validar que el ID del producto sea único
+        const q = query(collection(db, "products"), where("productId", "==", this.productId));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          alert("El producto ya existe.");
+          return;
+        }
+
+        const docRef = await addDoc(collection(db, "products"), {
+          productImage: this.productImage,
+          productName: this.productName,
+          productId: this.productId,
+          productCategory: this.productCategory,
+          productBuyingPrice: this.productBuyingPrice,
+          productQuantity: this.productQuantity,
+          productUnit: this.productUnit,
+          productExpiryDate: this.productExpiryDate,
+          productThresholdValue: this.productThresholdValue
+        });
+
+        console.log("Producto guardado con ID: ", docRef.id);
+
+        this.dialog = false;
+        this.clearForm();
+
+      } catch (e) {
+        console.error("Error al agregar el producto: ", e);
+      }
+    },
+    async getProducts() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        this.items = [];
+        querySnapshot.forEach((doc) => {
+          this.items.push({ 
+            Products: doc.data().productName,
+            Buying_Price: "$ " + doc.data().productBuyingPrice,
+            Quantity: doc.data().productQuantity + " Packets",
+            Threshold_Value: doc.data().productThresholdValue + " Packets",
+            Expiration_Date: doc.data().productExpiryDate,
+            Avalability: doc.data().productQuantity > doc.data().productThresholdValue ? "In - Stock" : "Out of stock",
+          });
+        });
+      } catch (e) {
+        console.error("Error al obtener los productos: ", e);
+      }
     }
+    
   }
 }
 </script>
@@ -120,7 +198,7 @@ export default{
                   <span>{{ numeroCategorias}}</span>
                   <h5 style="color: gray; font-weight: 100;">Last 7 days</h5>
                 </v-col>
-                <v-divider vertical="true"></v-divider>
+                <v-divider :vertical="true"></v-divider>
                 <v-col>
                   <h4 style="color: orange;">Total Products</h4>
                   <v-row>
@@ -134,7 +212,7 @@ export default{
                     </v-col>
                   </v-row>
                 </v-col>
-                <v-divider vertical="true"></v-divider>
+                <v-divider :vertical="true"></v-divider>
                 <v-col>
                   <h4 style="color: purple;">Top Selling</h4>
                   <v-row>
@@ -148,7 +226,7 @@ export default{
                     </v-col>
                   </v-row>
                 </v-col>
-                <v-divider vertical="true"></v-divider>
+                <v-divider :vertical="true"></v-divider>
                 <v-col>
                   <h4 style="color: red;">Low Stocks</h4>
                   <v-row>
@@ -174,7 +252,10 @@ export default{
                 <v-col>
                   <div id="tarjeta3Botones">
                     <h3 style="margin-bottom: 10px;">Products</h3>
-                    <v-btn color="rgb(0, 140, 255)" style="margin: 0px 10px 0px 10px; text-transform: capitalize;">Add Product</v-btn>
+                    <v-btn color="rgb(0, 140, 255)" style="margin: 0px 10px 0px 10px; text-transform: capitalize;"
+                      @click="dialog = true">
+                      Add Product
+                    </v-btn>
                     <v-btn color="white" style="margin: 0px 10px 0px 10px; text-transform: capitalize;">
                       <v-icon>
                         mdi-filter-variant
@@ -197,6 +278,124 @@ export default{
             </v-card>
           </v-col>
         </v-row>
+
+        <!-- Ventana Emergente -->
+        <template>
+          <div>
+          <v-dialog v-model="dialog" max-width="600px">
+            <v-card>
+              <h3 style="padding: 20px 0px 10px 20px;">New Product</h3>
+              <v-form>
+                <v-container>
+                  <v-row>
+                    <v-col>
+                      <div class="campos">
+                        <label for="productImage">Product Image</label>
+                        <v-text-field
+                          id="productImage"
+                          v-model="productImage"
+                          label="Enter URL Image"
+                          required
+                        >
+                        </v-text-field>
+                      </div>
+                      <div class="campos">
+                        <label for="productName">Product Name</label>
+                        <v-text-field
+                          id="productName"
+                          v-model="productName"
+                          label="Enter product name"
+                          required
+                        >
+                        </v-text-field>
+                      </div>
+                      <div class="campos">
+                        <label for="productId">Product ID</label>
+                        <v-text-field
+                          id="productId"
+                          v-model="productId"
+                          label="Enter product ID"
+                          required
+                        >
+                        </v-text-field>
+                      </div>
+                      <div class="campos">
+                        <label for="productCategory">Category</label>
+                        <v-text-field
+                          id="productcategory"
+                          v-model="productCategory"
+                          label="Select product category"
+                          required
+                        >
+                        </v-text-field>
+                      </div>
+                      <div class="campos">
+                        <label for="productBuyingPrice">Buying Price</label>
+                        <v-text-field
+                          type="number"
+                          id="productBuyingPrice"
+                          v-model="productBuyingPrice"
+                          label="Enter buying price"
+                          required
+                        >
+                        </v-text-field>
+                      </div>
+                      <div class="campos">
+                        <label for="productQuantity">Quantity</label>
+                        <v-text-field
+                          id="productQuantity"
+                          type="number"
+                          v-model="productQuantity"
+                          label="Enter product quantity"
+                          required
+                        >
+                        </v-text-field>
+                      </div>
+                      <div class="campos">
+                        <label for="productUnit">Unit</label>
+                        <v-text-field
+                          id="productUnit"
+                          v-model="productUnit"
+                          label="Enter product unit"
+                          required
+                        >
+                        </v-text-field>
+                      </div>
+                      <div class="campos">
+                        <label for="productExpiryDate">Expiry Date</label>
+                        <v-text-field
+                          id="productExpiryDate"
+                          v-model="productExpiryDate"
+                          label="Enter expiry date"
+                          required
+                        >
+                        </v-text-field>
+                      </div>
+                      <div class="campos">
+                        <label for="productThresholdValue">Threshold Value</label>
+                        <v-text-field
+                          id="productThresholdValue"
+                          v-model="productThresholdValue"
+                          label="Enter threshold value"
+                          required
+                        >
+                        </v-text-field>
+                      </div>
+                      
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-form>
+              <v-card-actions>
+                <v-btn @click="dialog = false" >Discard</v-btn>
+                <v-btn color="white" style="background-color: rgb(0, 140, 255);" @click="submitForm">Add Product</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          </div>
+        </template>
+        
+
       </v-main>
     </v-app>
 </template>
@@ -285,5 +484,18 @@ export default{
 #tarjeta3Botones h3 {
   width: 70%;
 }
+
+.campos {
+  display: flex;
+  flex-direction: row;
+}
+
+
+.campos label {
+  width: 30%;
+  text-align: center;
+  align-content: center;
+}
+
 
 </style>
