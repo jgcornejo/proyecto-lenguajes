@@ -5,7 +5,15 @@ export default{
     return {
       search: '',
       numeroCategorias: 0,
-      totalProductos: 0
+      totalProductos: 0,
+      items: [
+        { products: '', buyingPrice: '', Quantity: '', thresholdValue: '', expirityDate: '', Availability: ''},
+        { products: '1', buyingPrice: '', Quantity: '', thresholdValue: '', expirityDate: '', Availability: ''},
+        { products: '2', buyingPrice: '', Quantity: '', thresholdValue: '', expirityDate: '', Availability: ''},
+        { products: '3', buyingPrice: '', Quantity: '', thresholdValue: '', expirityDate: '', Availability: ''},
+        { products: '4', buyingPrice: '', Quantity: '', thresholdValue: '', expirityDate: '', Availability: ''},
+        { products: '5', buyingPrice: '', Quantity: '', thresholdValue: '', expirityDate: '', Availability: ''},
+      ]
     }
   },
   mounted() {
@@ -161,7 +169,32 @@ export default{
         </v-row>
         <v-row>
           <v-col>
-            col 2
+            <v-card id="tarjeta3">
+              <v-row>
+                <v-col>
+                  <div id="tarjeta3Botones">
+                    <h3 style="margin-bottom: 10px;">Products</h3>
+                    <v-btn color="rgb(0, 140, 255)" style="margin: 0px 10px 0px 10px; text-transform: capitalize;">Add Product</v-btn>
+                    <v-btn color="white" style="margin: 0px 10px 0px 10px; text-transform: capitalize;">
+                      <v-icon>
+                        mdi-filter-variant
+                      </v-icon>
+                      Filters
+                    </v-btn>
+                    <v-btn color="white" style="margin: 0px 10px 0px 10px; text-transform: capitalize;">
+                      Download all
+                    </v-btn>
+                  </div>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <div id="tarjeta3Tabla">
+                    <v-data-table :items="items" dense :items-per-page="4"></v-data-table>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-card>
           </v-col>
         </v-row>
       </v-main>
@@ -238,5 +271,19 @@ export default{
   text-align: left;
 }
 
+#tarjeta3 {
+  margin: 0px 20px 0px 20px;
+  padding: 20px;
+  text-align: left;
+}
+
+#tarjeta3Botones {
+  display: flex;
+  align-items: center;
+}
+
+#tarjeta3Botones h3 {
+  width: 70%;
+}
 
 </style>
