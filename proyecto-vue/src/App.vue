@@ -10,7 +10,6 @@
             <h1>KANBAN</h1>
           </div>
         </v-list-item>
-        <v-divider ></v-divider>
         <v-list-item link>
           <v-icon>mdi-home</v-icon>
           <a href="">Dashboard</a>
@@ -35,7 +34,6 @@
           <v-icon>mdi-clipboard-list-outline</v-icon>
           <a href="">Manage Store</a>
         </v-list-item>
-        <v-divider></v-divider>
         <v-list>
           <v-list-item link>
             <v-icon>mdi-cog-outline</v-icon>
