@@ -1,4 +1,28 @@
-<script setup>
+<script>
+export default{
+  name: 'App',
+  data() {
+    return {
+      search: '',
+      numeroCategorias: 0,
+      totalProductos: 0
+    }
+  },
+  mounted() {
+    this.numeroCategorias = this.getCategories();
+    this.totalProductos = this.getTotalProducts();
+  },
+  methods: {
+    getCategories() {
+      // Aqui va la logica para obtener el numero de categorias
+      return 14;
+    },
+    getTotalProducts() {
+      // Aqui va la logica para obtener el total de productos
+      return 100;
+    }
+  }
+}
 </script>
 
 <template>
@@ -80,8 +104,57 @@
         </v-row>
         <v-row>
           <v-col>
-            <v-card id="tarjeta1">
-              <h3>Overall Inventory</h3>
+            <v-card id="tarjeta2">
+              <h3 style="margin-bottom: 10px;">Overall Inventory</h3>
+              <v-row>
+                <v-col>
+                  <h4 style="color: rgb(0, 140, 255);">Categories</h4>
+                  <span>{{ numeroCategorias}}</span>
+                  <h5 style="color: gray; font-weight: 100;">Last 7 days</h5>
+                </v-col>
+                <v-divider vertical="true"></v-divider>
+                <v-col>
+                  <h4 style="color: orange;">Total Products</h4>
+                  <v-row>
+                    <v-col>
+                      <span>{{ totalProductos }}</span>
+                      <h5 style="color: gray; font-weight: 100;">Last 7 days</h5>
+                    </v-col>
+                    <v-col>
+                      <span>$25000</span>
+                      <h5 style="color: gray; font-weight: 100;">Revenue</h5>
+                    </v-col>
+                  </v-row>
+                </v-col>
+                <v-divider vertical="true"></v-divider>
+                <v-col>
+                  <h4 style="color: purple;">Top Selling</h4>
+                  <v-row>
+                    <v-col>
+                      <span>5</span>
+                      <h5 style="color: gray; font-weight: 100;">Last 7 days</h5>
+                    </v-col>
+                    <v-col>
+                      <span>$2500</span>
+                      <h5 style="color: gray; font-weight: 100;">Cost</h5>
+                    </v-col>
+                  </v-row>
+                </v-col>
+                <v-divider vertical="true"></v-divider>
+                <v-col>
+                  <h4 style="color: red;">Low Stocks</h4>
+                  <v-row>
+                    <v-col>
+                      <span>12</span>
+                      <h5 style="color: gray; font-weight: 100;">Ordered</h5>
+                    </v-col>
+                    <v-col>
+                      <span>2</span>
+                      <h5 style="color: gray; font-weight: 100;">Not in stock</h5>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
               
             </v-card>
           </v-col>
@@ -105,8 +178,8 @@
 
 #logo h1 {
   align-items: center;
-  font-weight: 500;
-  font-size: 19px;
+  font-weight: 900;
+  font-size: 17px;
 }
 
 .v-list-item {
@@ -158,4 +231,12 @@
 #lista2{
   margin-top: 90%;
 }
+
+#tarjeta2 {
+  margin: 0px 20px 0px 20px;
+  padding: 20px;
+  text-align: left;
+}
+
+
 </style>
