@@ -1,6 +1,6 @@
 <script>
 import { db } from '../firebase.js';
-import {collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where} from 'firebase/firestore';
+import {collection, addDoc, getDocs, getDoc, updateDoc, deleteDoc, doc, query, where} from 'firebase/firestore';
 
 export default{
   name: 'App',
@@ -25,6 +25,8 @@ export default{
       productExpiryDate: '',
       productThresholdValue: '',
       items: [
+      ],
+      itemsHidden: [
       ]
       
     }
@@ -40,6 +42,13 @@ export default{
         this.getProducts()
       } else {
         this.loading = true
+      }
+    },
+    showEdit(newValue) {
+      if (newValue) {
+        this.fillForm(this.selectedProduct)
+      } else {
+        this.clearForm()
       }
     }
   },
@@ -58,6 +67,17 @@ export default{
       this.showDetails = true
 
       console.log(this.selectedProduct)
+    },
+    async fillForm(item) {
+      this.productImage = item.productImage;
+      this.productName = item.Products;
+      this.productId = item.productId;
+      this.productCategory = item.productCategory;
+      this.productBuyingPrice = item.Buying_Price.replace('$', '').trim(); 
+      this.productQuantity = item.Quantity.replace('Packets', '').trim(); 
+      this.productUnit = item.Avalability; 
+      this.productExpiryDate = item.Expiration_Date;
+      this.productThresholdValue = item.Threshold_Value; 
     },
     clearForm() {
       this.productImage = '';
@@ -124,6 +144,7 @@ export default{
             productCategory: doc.data().productCategory,
             productId: doc.data().productId
           });
+          
         });
       } catch (e) {
         console.error("Error al obtener los productos: ", e);
@@ -635,6 +656,122 @@ export default{
           </div>
         </template>       
 
+        <!-- Ventana Emergente para editar -->
+        <template>
+          <div>
+            <v-dialog v-model="showEdit" max-width="600px">
+              <v-card>
+                <h3 style="padding: 20px 0px 10px 20px;">New Product</h3>
+                <v-form>
+                  <v-container>
+                    <v-row>
+                      <v-col>
+                        <div class="campos">
+                          <label for="productImage">Product Image</label>
+                          <v-text-field
+                            id="productImage"
+                            v-model="productImage"
+                            label="Enter URL Image"
+                            required
+                          >
+                          </v-text-field>
+                        </div>
+                        <div class="campos">
+                          <label for="productName">Product Name</label>
+                          <v-text-field
+                            id="productName"
+                            v-model="productName"
+                            label="Enter product name"
+                            required
+                          >
+                          </v-text-field>
+                        </div>
+                        <div class="campos">
+                          <label for="productId">Product ID</label>
+                          <v-text-field
+                            id="productId"
+                            v-model="productId"
+                            label="Enter product ID"
+                            required
+                          >
+                          </v-text-field>
+                        </div>
+                        <div class="campos">
+                          <label for="productCategory">Category</label>
+                          <v-text-field
+                            id="productcategory"
+                            v-model="productCategory"
+                            label="Select product category"
+                            required
+                          >
+                          </v-text-field>
+                        </div>
+                        <div class="campos">
+                          <label for="productBuyingPrice">Buying Price</label>
+                          <v-text-field
+                            type="number"
+                            id="productBuyingPrice"
+                            v-model="productBuyingPrice"
+                            label="Enter buying price"
+                            required
+                          >
+                          </v-text-field>
+                        </div>
+                        <div class="campos">
+                          <label for="productQuantity">Quantity</label>
+                          <v-text-field
+                            id="productQuantity"
+                            type="number"
+                            v-model="productQuantity"
+                            label="Enter product quantity"
+                            required
+                          >
+                          </v-text-field>
+                        </div>
+                        <div class="campos">
+                          <label for="productUnit">Unit</label>
+                          <v-text-field
+                            id="productUnit"
+                            v-model="productUnit"
+                            label="Enter product unit"
+                            required
+                          >
+                          </v-text-field>
+                        </div>
+                        <div class="campos">
+                          <label for="productExpiryDate">Expiry Date</label>
+                          <v-text-field
+                            id="productExpiryDate"
+                            v-model="productExpiryDate"
+                            label="Enter expiry date"
+                            required
+                          >
+                          </v-text-field>
+                        </div>
+                        <div class="campos">
+                          <label for="productThresholdValue">Threshold Value</label>
+                          <v-text-field
+                            id="productThresholdValue"
+                            v-model="productThresholdValue"
+                            label="Enter threshold value"
+                            required
+                          >
+                          </v-text-field>
+                        </div>
+                        
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </v-form>
+                <v-card-actions>
+                  <v-btn @click="showEdit = false" >Discard</v-btn>
+                  <v-btn color="white" style="background-color: rgb(0, 140, 255);" @click="submitForm">Add Product</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </div>
+        </template>  
+        
       </v-main>
     </v-app>
 </template>
