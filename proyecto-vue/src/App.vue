@@ -154,6 +154,7 @@ export default{
 
         this.dialog = false;
         this.clearForm();
+        window.location.reload();
 
       } catch (e) {
         console.error("Error al agregar el producto: ", e);
