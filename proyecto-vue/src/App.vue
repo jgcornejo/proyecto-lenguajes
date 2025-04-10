@@ -1,6 +1,6 @@
 <script>
 import { db } from '../firebase.js';
-import {collection, addDoc, getDocs, getDoc, updateDoc, deleteDoc, doc, query, where} from 'firebase/firestore';
+import {collection, addDoc, getDocs, getDoc, updateDoc, doc, query, where} from 'firebase/firestore';
 
 export default{
   name: 'App',
@@ -25,8 +25,6 @@ export default{
       productExpiryDate: '',
       productThresholdValue: '',
       items: [
-      ],
-      itemsHidden: [
       ]
       
     }
@@ -54,19 +52,52 @@ export default{
   },
   methods: {
     getCategories() {
-      // Aqui va la logica para obtener el numero de categorias
-      return 14;
+      return this.numeroCategorias;
     },
     getTotalProducts() {
-      // Aqui va la logica para obtener el total de productos
-      return 100;
+      return this.totalProductos;
     },
     selectProduct(item) {
 
       this.selectedProduct = item
       this.showDetails = true
-
       console.log(this.selectedProduct)
+    },
+    async updateProduct() {
+      try {
+        
+        const existingProductQuery = query(collection(db, 'products'), where('productId', '==', this.selectedProduct.productId)) //hace una consulta
+        const docsRef = await getDocs(existingProductQuery) //regresa los documentos que encontro
+        
+        if(docsRef.empty)
+        {
+            console.log('El producto que deseas actualizar no existe.')
+            return
+        }
+
+        const productRef = docsRef.docs[0].ref 
+        // Limpia los valores antes de actualizar
+        const cleanedQuantity = this.productQuantity.replace(' Packets', '').trim(); 
+        const cleanedThresholdValue = this.productThresholdValue.replace(/ Packets/g, '').trim(); 
+
+        await updateDoc(productRef, {
+          productImage: this.productImage,
+          productName: this.productName,
+          productId: this.productId,
+          productCategory: this.productCategory,
+          productBuyingPrice: this.productBuyingPrice,
+          productQuantity: `${cleanedQuantity}`,
+          productUnit: this.productUnit,
+          productExpiryDate: this.productExpiryDate,
+          productThresholdValue: `${cleanedThresholdValue}`,
+        });
+        console.log("Producto actualizado con ID: ", this.productId);
+        this.showEdit = false;
+        this.clearForm();
+        window.location.reload();
+      } catch (e) {
+        console.error("Error al actualizar el producto: ", e);
+      }
     },
     async fillForm(item) {
       this.productImage = item.productImage;
@@ -77,7 +108,7 @@ export default{
       this.productQuantity = item.Quantity.replace('Packets', '').trim(); 
       this.productUnit = item.Avalability; 
       this.productExpiryDate = item.Expiration_Date;
-      this.productThresholdValue = item.Threshold_Value; 
+      this.productThresholdValue = item.Threshold_Value.replace('Packets', '').trim(); 
     },
     clearForm() {
       this.productImage = '';
@@ -144,6 +175,9 @@ export default{
             productCategory: doc.data().productCategory,
             productId: doc.data().productId
           });
+
+          this.totalProductos = this.items.length;
+          this.numeroCategorias = new Set(this.items.map(item => item.productCategory)).size;
           
         });
       } catch (e) {
@@ -605,7 +639,6 @@ export default{
                         <label for="productQuantity">Quantity</label>
                         <v-text-field
                           id="productQuantity"
-                          type="number"
                           v-model="productQuantity"
                           label="Enter product quantity"
                           required
@@ -721,7 +754,6 @@ export default{
                           <label for="productQuantity">Quantity</label>
                           <v-text-field
                             id="productQuantity"
-                            type="number"
                             v-model="productQuantity"
                             label="Enter product quantity"
                             required
@@ -765,7 +797,7 @@ export default{
                 </v-form>
                 <v-card-actions>
                   <v-btn @click="showEdit = false" >Discard</v-btn>
-                  <v-btn color="white" style="background-color: rgb(0, 140, 255);" @click="submitForm">Add Product</v-btn>
+                  <v-btn color="white" style="background-color: rgb(0, 140, 255);" @click="updateProduct">Update Product</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
