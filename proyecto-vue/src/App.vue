@@ -404,7 +404,7 @@ export default{
               </v-row>
               <v-row>
                 <div id="tarjeta4Columnas">
-                  <v-col id="tarjeta4Columna1" cols="7">
+                  <v-col id="tarjeta4Columna1" cols="9">
                     <div>
                       <h4>Primary Details</h4>
                       <div style="color: gray; 
@@ -447,12 +447,12 @@ export default{
 
                       </div>
 
-                      <h4 style="margin-top: 10px;">Stock Locations</h4>
+                      <h4 style="margin-top: 20px;">Stock Locations</h4>
                       <div style="color: gray; 
                         font-weight: 100; display: flex;
-                        margin-top: 20px;"
+                        margin-top: 0px;"
                       >
-                        <v-row style="">
+                        <v-row>
                           <v-col>
                             <v-row 
                               style="background-color: rgb(240, 240, 240);
@@ -462,7 +462,8 @@ export default{
                                 <p style="font-weight: bold;">Store Name</p>
                               </v-col>
                               <v-col>
-                                <p style="font-weight: bold; text-align: right; padding-right: 10px;">Stock in hand</p>
+                                <p style="font-weight: bold; text-align: right; padding-right: 10px;
+                                ">Stock in hand</p>
                               </v-col>
                             </v-row>
                             <v-row style="
@@ -483,14 +484,33 @@ export default{
                       
                     </div>
                   </v-col>
-                  <v-col id="tarjeta4Columna2" cols="5">
-                    <div >
-                      <img
-                        :src="selectedProduct.productImage"
-                        alt="Product Image"
-                        width="170px"
-                        height="150px"
-                      />
+                  <v-col id="tarjeta4Columna2" cols="3">
+                    <div style="width: 100%;">
+                      <v-row>
+                        <v-col>
+                          <img
+                            :src="selectedProduct.productImage"
+                            alt="Product Image"
+                            width="150px"
+                            height="150px"
+                            style="border: 4px dotted lightgray;"
+                          />
+                        </v-col>
+                      </v-row>
+                      <v-row style="text-align: left;">
+                        <v-col style="color: gray;">
+                          <p style="margin-bottom: 5px;">Opening Stock</p>
+                          <p style="margin-bottom: 5px;">Remaining Stock</p>
+                          <p style="margin-bottom: 5px;">On the way</p>
+                          <p style="margin-bottom: 5px;">Threshold value</p>
+                        </v-col>
+                        <v-col style="text-align: center;">
+                          <p style="margin-bottom: 5px;">40</p>
+                          <p style="margin-bottom: 5px;">34</p>
+                          <p style="margin-bottom: 5px;">15</p>
+                          <p style="margin-bottom: 5px;">{{ selectedProduct.Threshold_Value }}</p>
+                        </v-col>
+                      </v-row>
                     </div>
                   </v-col>
                 </div>
