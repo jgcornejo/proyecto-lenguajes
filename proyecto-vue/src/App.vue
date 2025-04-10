@@ -26,6 +26,7 @@ export default{
       productThresholdValue: '',
       items: [
       ]
+      
     }
   },
   mounted() {
@@ -52,8 +53,11 @@ export default{
       return 100;
     },
     selectProduct(item) {
+
       this.selectedProduct = item
       this.showDetails = true
+
+      console.log(this.selectedProduct)
     },
     clearForm() {
       this.productImage = '';
@@ -92,7 +96,7 @@ export default{
           productQuantity: this.productQuantity,
           productUnit: this.productUnit,
           productExpiryDate: this.productExpiryDate,
-          productThresholdValue: this.productThresholdValue
+          productThresholdValue: this.productThresholdValue,
         });
 
         console.log("Producto guardado con ID: ", docRef.id);
@@ -116,6 +120,9 @@ export default{
             Threshold_Value: doc.data().productThresholdValue + " Packets",
             Expiration_Date: doc.data().productExpiryDate,
             Avalability: doc.data().productQuantity > doc.data().productThresholdValue ? "In - Stock" : "Out of stock",
+            productImage: doc.data().productImage,
+            productCategory: doc.data().productCategory,
+            productId: doc.data().productId
           });
         });
       } catch (e) {
@@ -135,6 +142,9 @@ export default{
             Threshold_Value: doc.data().productThresholdValue + " Packets",
             Expiration_Date: doc.data().productExpiryDate,
             Avalability: doc.data().productQuantity > doc.data().productThresholdValue ? "In - Stock" : "Out of stock",
+            productImage: doc.data().productImage,
+            productCategory: doc.data().productCategory,
+            productId: doc.data().productId
           })
         })
         
@@ -306,22 +316,38 @@ export default{
               </v-row>
               <v-row v-if="!showDetails">
                 <v-col>
+                  
                   <div id="tarjeta3Tabla">
-                    <v-data-table :items="items" 
-                      dense :items-per-page="4" 
+                    <v-data-table 
+                      :items="items"
+                      dense
+                      :items-per-page="4"
                       :search="search"
+                      @click:row="selectProduct"
                     >
-                      <template v-slot:item="{ item }">
-                        <tr @click="selectProduct(item)">
-                          <td>{{ item.Products }}</td>
-                          <td>{{ item.Buying_Price }}</td>
-                          <td>{{ item.Quantity }}</td>
-                          <td>{{ item.Threshold_Value }}</td>
-                          <td>{{ item.Expiration_Date }}</td>
-                          <td>{{ item.Avalability }}</td>
-                        </tr>
-                      </template>
+                    <template v-slot:item="{ item }">
+                      <tr @click="selectProduct(item)">
+                        <td>{{ item.Products }}</td>
+                        <td>{{ item.Buying_Price }}</td>
+                        <td>{{ item.Quantity }}</td>
+                        <td>{{ item.Threshold_Value }}</td>
+                        <td>{{ item.Expiration_Date }}</td>
+                        <td>{{ item.Avalability }}</td>
+                        <td>
+                          <img
+                            :src="item.productImage"
+                            alt="Product Image"
+                            width="50px"
+                            height="50px"
+                          />
+                        </td>
+                        <td>{{ item.productCategory }}</td>
+                        <td>{{ item.productId }}</td>
+                      </tr>
+                    </template>
+
                     </v-data-table>
+
                   </div>
                 </v-col>
               </v-row>
@@ -342,14 +368,58 @@ export default{
                     <v-btn @click="showEdit = true"
                       style="margin-right: 20px;"
                       prepend-icon="mdi-pencil"
+                      size="small"
                     >
                       Edit
                     </v-btn>
-                    <v-btn>
+                    <v-btn
+                      size="small"
+                    >
                       Download
                     </v-btn>
                   </div>
                 </v-col>
+              </v-row>
+              <v-row>
+                <v-col style="padding: 0px 20px 0px 20px;">
+                  <div id="tarjeta4Div">
+                    <v-list id="tarjeta4Opciones">
+                      <v-list-item style="color: rgb(0, 140, 255); 
+                        border-bottom: 3px solid rgb(0, 140, 255);"
+                      >
+                        Overview
+                      </v-list-item>
+                      <v-list-item>
+                        Purchases
+                      </v-list-item>
+                      <v-list-item>
+                        Adjustments
+                      </v-list-item>
+                      <v-list-item>
+                        History
+                      </v-list-item>
+                    </v-list>
+                  </div>
+                </v-col>
+              </v-row>
+              <v-row>
+                <div id="tarjeta4Columnas">
+                  <v-col id="tarjeta4Columna1" cols="7">
+                    <div>
+                      <h4>Primary Details</h4>
+                    </div>
+                  </v-col>
+                  <v-col id="tarjeta4Columna2" cols="5">
+                    <div >
+                      <img
+                        :src="selectedProduct.productImage"
+                        alt="Product Image"
+                        width="100px"
+                        height="100px"
+                      />
+                    </div>
+                  </v-col>
+                </div>
               </v-row>
             </v-card>
           </v-col>
@@ -562,16 +632,51 @@ export default{
 
 #tarjeta4 {
   margin: 0px 20px 0px 20px;
-  padding: 20px;
+  padding: 15px;
+}
+
+#tarjeta4Div {
+  margin: 0;
 }
 
 #tarjeta4Botones {
   display: flex;
   align-items: center;
+  margin-bottom: 0px;
 }
 
 #tarjeta4Botones h3 {
-  width: 80%;
+  width: 90%;
+}
+
+
+
+#tarjeta4Opciones {
+  margin-top: 0px;
+  display: flex;
+  width: 60%;
+}
+
+#tarjeta4Opciones .v-list-item {
+  margin: 0px 20px 0px 5px;
+  text-align: left;
+  color: gray;
+}
+
+#tarjeta4Columnas {
+  width: 100%;
+  display: flex;
+}
+
+#tarjeta4Columna1 {
+  text-align: left;
+}
+
+#tarjeta4Columna2 {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  padding-right: 20px;
 }
 
 .campos {
