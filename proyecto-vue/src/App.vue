@@ -131,7 +131,7 @@ export default{
     },
     async filterProducts() {
       try {
-        const q = query(collection(db, "products"), where("productName", "==", this.search))
+        const q = query(collection(db, "products"), where("productName", "==", this.search), where("productCategory", "==", this.search));
         const querySnapshot = await getDocs(q)
         this.items = [];
         querySnapshot.forEach((doc) => {
@@ -407,6 +407,80 @@ export default{
                   <v-col id="tarjeta4Columna1" cols="7">
                     <div>
                       <h4>Primary Details</h4>
+                      <div style="color: gray; 
+                        font-weight: 100; display: flex;
+                        margin-top: 20px;
+                      ">
+                        <v-row>
+                          <v-col>
+                            <p style="margin-right: 30px;">Product name</p>
+                            <p style="margin-right: 30px;">Product ID</p>
+                            <p style="margin-right: 30px;">Product Category</p>
+                            <p style="margin-right: 30px;">Expiry Date</p>
+                            <p style="margin-right: 30px;">Threshold Value</p>
+                          </v-col>
+                          <v-col>
+                            <p>{{ selectedProduct.Products }}</p>
+                            <p>{{ selectedProduct.productId }}</p>
+                            <p>{{ selectedProduct.productCategory }}</p>
+                            <p>{{ selectedProduct.Expiration_Date }}</p>
+                            <p>{{ selectedProduct.Threshold_Value }}</p>
+                          </v-col>
+                        </v-row>
+                      </div>
+
+                      <h4 style="margin-top: 10px;">Suplier Details</h4>
+                      <div style="color: gray; 
+                        font-weight: 100; display: flex;
+                        margin-top: 20px;"
+                      >
+                        <v-row>
+                          <v-col>
+                            <p style="margin-right: 30px;">Supplier name</p>
+                            <p style="margin-right: 30px;">Contact Number</p>
+                          </v-col>
+                          <v-col>
+                            <p>Ronald Martin</p>
+                            <p>4647864513</p>
+                          </v-col>
+                        </v-row>
+
+                      </div>
+
+                      <h4 style="margin-top: 10px;">Stock Locations</h4>
+                      <div style="color: gray; 
+                        font-weight: 100; display: flex;
+                        margin-top: 20px;"
+                      >
+                        <v-row style="">
+                          <v-col>
+                            <v-row 
+                              style="background-color: rgb(240, 240, 240);
+                              margin: 20px 0px 0px 10px;  
+                            ">
+                              <v-col>
+                                <p style="font-weight: bold;">Store Name</p>
+                              </v-col>
+                              <v-col>
+                                <p style="font-weight: bold; text-align: right; padding-right: 10px;">Stock in hand</p>
+                              </v-col>
+                            </v-row>
+                            <v-row style="
+                              margin: 0px 0px 0px 10px;  
+                            ">
+                              <v-col>
+                                <p>Sulur Branch</p>
+                                <p>Singanallur Branch</p>
+                              </v-col>
+                              <v-col style="text-align: right;">
+                                <p style="padding-right: 10px;">15</p>
+                                <p style="padding-right: 10px;">19</p>
+                              </v-col>
+                            </v-row>
+                          </v-col>
+                        </v-row>
+                      </div>  
+                      
                     </div>
                   </v-col>
                   <v-col id="tarjeta4Columna2" cols="5">
@@ -414,8 +488,8 @@ export default{
                       <img
                         :src="selectedProduct.productImage"
                         alt="Product Image"
-                        width="100px"
-                        height="100px"
+                        width="170px"
+                        height="150px"
                       />
                     </div>
                   </v-col>
